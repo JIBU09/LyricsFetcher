@@ -9,6 +9,7 @@ import time
 import requests
 from colorthief import ColorThief
 from io import BytesIO
+import re  # Import the regex module for handling parentheses
 
 load_dotenv()
 GENIUS_API_TOKEN: Final[str] = os.getenv('GENIUS_TOKEN')
@@ -75,6 +76,14 @@ def check_song_change():
                     search_query = f"{current_song_name} by {current_primary_artist}"
                     song = genius.search_song(search_query)
 
+                    # If no song is found, check for parentheses and retry
+                    if not song and "(" in current_song_name and ")" in current_song_name:
+                        # Remove content inside parentheses
+                        current_song_name_no_parentheses = re.sub(r"\s*\(.*?\)\s*", " ", current_song_name).strip()
+                        print(f"Retrying search without parentheses: {current_song_name_no_parentheses}")
+                        search_query = f"{current_song_name_no_parentheses} by {current_primary_artist}"
+                        song = genius.search_song(search_query)
+
                     if song:
                         songInfo["title"] = song.title
                         songInfo["artist"] = song.artist
@@ -121,10 +130,10 @@ def check_song_change():
                             # No song found
                             songInfo["title"] = current_song_name
                             songInfo["artist"] = current_artist_name
-                            songInfo["songArtImagePath"] = "https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green.png"
+                            songInfo["songArtImagePath"] = "https://clipartcraft.com/images/spotify-logo-transparent-icon-2.png"
                             songInfo["embed"] = f"https://open.spotify.com/embed/track/{track_id}"
                             songInfo["lyrics"] = "No lyrics found..."
-                            songInfo["dominantColor"] = [255, 255, 255]
+                            songInfo["dominantColor"] = dominant_color
                     # Add the current song's embed link to the latestSongs list
                     embed_link = songInfo["embed"]
                     if embed_link not in songInfo["latestSongs"]:
