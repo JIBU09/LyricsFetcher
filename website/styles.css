@@ -49,15 +49,6 @@ body {
     border: 2px solid #ccc;
 }
 
-.embed {
-    width: 100%;
-    max-width: 500px;
-    display: block;
-    margin: 0 auto;
-    animation: fadeInFromTop 1s ease-out 0.3s;
-    animation-fill-mode: both;
-    border: none;
-}
 
 @keyframes fadeInFromTop {
     0% {
